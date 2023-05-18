@@ -28,11 +28,31 @@ async function run() {
         await client.connect();
         // Send a ping to confirm a successful connection
         const categoryCollection = client.db('categoryDB').collection('category')
+        const addedProductsCollection = client.db('categoryDB').collection('products')
+
+        //  category data
+
 
         app.get('/categories', async (req, res) => {
             const result = await categoryCollection.find().toArray()
             res.send(result)
         })
+
+        // Add toy data by user
+
+        app.post('/addToy', async (req, res) => {
+            const dataFromClient = req.body
+            const result = await addedProductsCollection.insertOne(dataFromClient)
+            res.send(result)
+        })
+
+
+        app.get('/addToy', async (req, res) => {
+            const result = await addedProductsCollection.find().toArray()
+            res.send(result)
+        })
+
+
 
 
         await client.db("admin").command({ ping: 1 });
