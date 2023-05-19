@@ -30,6 +30,26 @@ async function run() {
         const categoryCollection = client.db('categoryDB').collection('category')
         const addedProductsCollection = client.db('categoryDB').collection('products')
 
+        // indexing
+        const indexKeys = { toyName: 1, category: 1 }
+        const indexOptions = { name: 'toyNameCategory' }
+
+        const result = await addedProductsCollection.createIndex(indexKeys, indexOptions)
+
+
+        app.get('/searchByText/:text', async (req, res) => {
+            const searchedText = req.params.text
+
+            const result = await addedProductsCollection.find({
+                $or: [
+                    { toyName: { $regex: searchedText, $options: "i" } },
+                    { category: { $regex: searchedText, $options: "i" } },
+                ]
+            }).toArray()
+            res.send(result)
+        })
+
+
         //  category data
 
 
