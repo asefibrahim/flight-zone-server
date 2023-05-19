@@ -1,7 +1,7 @@
 const express = require('express')
 const cors = require('cors')
 require('dotenv').config()
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express()
 const port = process.env.PORT || 5000
 
@@ -46,13 +46,47 @@ async function run() {
             res.send(result)
         })
 
+        // all data of all user
+        app.get('/addedToys', async (req, res) => {
+            console.log(req.query.email);
 
-        app.get('/addToy', async (req, res) => {
-            const result = await addedProductsCollection.find().toArray()
+            let query = {}
+            if (req.query.email) {
+                query = {
+                    sellerEmail: req.query.email
+                }
+            }
+            const result = await addedProductsCollection.find(query).toArray()
             res.send(result)
         })
 
+        // delete 
 
+        app.delete('/addedToys/:id', async (req, res) => {
+            const id = req.params.id
+            const query = { _id: new ObjectId(id) }
+            const result = await addedProductsCollection.deleteOne(query)
+            res.send(result)
+        })
+
+        // update
+        app.put('/addedToys/:id', async (req, res) => {
+            const id = req.params.id
+            const infoFromClient = req.body
+            console.log(infoFromClient);
+            const query = { _id: new ObjectId(id) }
+            const options = { upsert: true }
+            const update = {
+                $set: {
+                    toyName: infoFromClient.toyName,
+                    price: infoFromClient.price,
+                    quantity: infoFromClient.quantity,
+                    description: infoFromClient.description
+                }
+            }
+            const result = await addedProductsCollection.updateOne(query, update, options)
+            res.send(result)
+        })
 
 
         await client.db("admin").command({ ping: 1 });
