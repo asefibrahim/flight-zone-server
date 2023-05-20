@@ -62,13 +62,15 @@ async function run() {
 
         app.post('/addToy', async (req, res) => {
             const dataFromClient = req.body
+
             const result = await addedProductsCollection.insertOne(dataFromClient)
             res.send(result)
         })
 
         // all data of all user
         app.get('/addedToys', async (req, res) => {
-            console.log(req.query.email);
+
+
 
             let query = {}
             if (req.query.email) {
@@ -76,8 +78,27 @@ async function run() {
                     sellerEmail: req.query.email
                 }
             }
+
+
+
+
+            if (req.query.text === 'Descending') {
+                const result = await addedProductsCollection.find(query).sort({ createdAt: -1 }).toArray()
+                return res.send(result)
+            }
+            if (req.query.text === 'Ascending') {
+                const result = await addedProductsCollection.find(query).sort({ createdAt: 1 }).toArray()
+                return res.send(result)
+            }
+
+
+
+
+
             const result = await addedProductsCollection.find(query).toArray()
             res.send(result)
+
+
         })
 
         // delete 
