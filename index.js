@@ -19,13 +19,23 @@ const client = new MongoClient(uri, {
         version: ServerApiVersion.v1,
         strict: true,
         deprecationErrors: true,
-    }
+    },
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    maxPoolSize: 10
 });
 
 async function run() {
     try {
+
+        client.connect((err) => {
+            if (err) {
+                console.error(err)
+                return
+            }
+        })
         // Connect the client to the server	(optional starting in v4.7)
-        await client.connect();
+        client.connect();
         // Send a ping to confirm a successful connection
         const categoryCollection = client.db('categoryDB').collection('category')
         const addedProductsCollection = client.db('categoryDB').collection('products')
