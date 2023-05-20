@@ -36,7 +36,7 @@ async function run() {
         })
         // Connect the client to the server	(optional starting in v4.7)
         client.connect();
-        // Send a ping to confirm a successful connection
+        // send a ping to confirm a successful connection
         const categoryCollection = client.db('categoryDB').collection('category')
         const addedProductsCollection = client.db('categoryDB').collection('products')
 
@@ -47,37 +47,7 @@ async function run() {
         const result = await addedProductsCollection.createIndex(indexKeys, indexOptions)
 
 
-        app.get('/searchByText/:text', async (req, res) => {
-            const searchedText = req.params.text
-
-            const result = await addedProductsCollection.find({
-                $or: [
-                    { toyName: { $regex: searchedText, $options: "i" } },
-                    { category: { $regex: searchedText, $options: "i" } },
-                ]
-            }).toArray()
-            res.send(result)
-        })
-
-
-        //  category data
-
-
-        app.get('/categories', async (req, res) => {
-            const result = await categoryCollection.find().toArray()
-            res.send(result)
-        })
-
-        // Add toy data by user
-
-        app.post('/addToy', async (req, res) => {
-            const dataFromClient = req.body
-
-            const result = await addedProductsCollection.insertOne(dataFromClient)
-            res.send(result)
-        })
-
-        // all data of all user
+        // load all data
         app.get('/addedToys', async (req, res) => {
 
 
@@ -94,11 +64,11 @@ async function run() {
 
             if (req.query.text === 'Descending') {
                 const result = await addedProductsCollection.find(query).sort({ createdAt: -1 }).toArray()
-                return res.send(result)
+                return res.json(result)
             }
             if (req.query.text === 'Ascending') {
                 const result = await addedProductsCollection.find(query).sort({ createdAt: 1 }).toArray()
-                return res.send(result)
+                return res.json(result)
             }
 
 
@@ -108,10 +78,52 @@ async function run() {
             const result = await addedProductsCollection.find(query).limit(limit).toArray()
 
 
-            res.send(result)
+            res.json(result)
 
 
         })
+
+
+
+
+        app.get('/searchByText/:text', async (req, res) => {
+            const searchedText = req.params.text
+
+            const result = await addedProductsCollection.find({
+                $or: [
+                    { toyName: { $regex: searchedText, $options: "i" } },
+                    { category: { $regex: searchedText, $options: "i" } },
+                ]
+            }).toArray()
+            res.json(result)
+        })
+
+
+        //  category data
+
+
+        app.get('/categories', async (req, res) => {
+            const result = await categoryCollection.find().toArray()
+            res.json(result)
+        })
+        app.get('/categories/:id', async (req, res) => {
+            const id = req.params.id
+            const filter = { _id: new ObjectId(id) }
+            const result = await categoryCollection.findOne(filter)
+            res.json(result)
+        })
+
+        // Add toy data by 
+
+        app.post('/addToy', async (req, res) => {
+            const dataFromClient = req.body
+
+            const result = await addedProductsCollection.insertOne(dataFromClient)
+            res.json(result)
+        })
+
+        // all data of all user
+
 
         // delete 
 
@@ -119,7 +131,7 @@ async function run() {
             const id = req.params.id
             const query = { _id: new ObjectId(id) }
             const result = await addedProductsCollection.deleteOne(query)
-            res.send(result)
+            res.json(result)
         })
 
         // update
@@ -138,7 +150,7 @@ async function run() {
                 }
             }
             const result = await addedProductsCollection.updateOne(query, update, options)
-            res.send(result)
+            res.json(result)
         })
 
         // load single toy 
@@ -150,8 +162,9 @@ async function run() {
             const id = req.params.id
             const filter = { _id: new ObjectId(id) }
             const result = await addedProductsCollection.findOne(filter)
-            res.send(result)
+            res.json(result)
         })
+
 
 
 
