@@ -93,9 +93,11 @@ async function run() {
 
 
 
+            const limit = 20
+
+            const result = await addedProductsCollection.find(query).limit(limit).toArray()
 
 
-            const result = await addedProductsCollection.find(query).toArray()
             res.send(result)
 
 
