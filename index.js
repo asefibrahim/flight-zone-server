@@ -20,31 +20,31 @@ const client = new MongoClient(uri, {
         strict: true,
         deprecationErrors: true,
     },
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    maxPoolSize: 10
+    // useNewUrlParser: true,
+    // useUnifiedTopology: true,
+    // maxPoolSize: 10
 });
 
 async function run() {
     try {
 
-        client.connect((err) => {
-            if (err) {
-                console.error(err)
-                return
-            }
-        })
+        // client.connect((err) => {
+        //     if (err) {
+        //         console.error(err)
+        //         return
+        //     }
+        // })
         // Connect the client to the server	(optional starting in v4.7)
-        client.connect();
+        // client.connect();
         // send a ping to confirm a successful connection
         const categoryCollection = client.db('categoryDB').collection('category')
         const addedProductsCollection = client.db('categoryDB').collection('products')
 
         // indexing
-        const indexKeys = { toyName: 1, category: 1 }
-        const indexOptions = { name: 'toyNameCategory' }
+        // const indexKeys = { toyName: 1, category: 1 }
+        // const indexOptions = { name: 'toyNameCategory' }
 
-        const result = await addedProductsCollection.createIndex(indexKeys, indexOptions)
+        // const result = await addedProductsCollection.createIndex(indexKeys, indexOptions)
 
 
         // load all data
@@ -63,11 +63,11 @@ async function run() {
 
 
             if (req.query.text === 'Descending') {
-                const result = await addedProductsCollection.find(query).sort({ createdAt: -1 }).toArray()
+                const result = await addedProductsCollection.find(query).sort({ price: -1 }).toArray()
                 return res.json(result)
             }
             if (req.query.text === 'Ascending') {
-                const result = await addedProductsCollection.find(query).sort({ createdAt: 1 }).toArray()
+                const result = await addedProductsCollection.find(query).sort({ price: 1 }).toArray()
                 return res.json(result)
             }
 
